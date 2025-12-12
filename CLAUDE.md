@@ -38,6 +38,55 @@ Before writing a script, check `execution/` per your directive. Only create new 
 **3. Update directives as you learn**
 Directives are living documents. When you discover API constraints, better approaches, common errors, or timing expectations—update the directive. But don't create or overwrite directives without asking unless explicitly told to. Directives are your instruction set and must be preserved (and improved upon over time, not extemporaneously used and then discarded).
 
+## Delegation to Local Ollama
+
+For privacy-sensitive workloads or light coding tasks, delegate to the local Ollama instance instead of using cloud APIs.
+
+**Use Ollama for:**
+- Boilerplate code generation (CRUD functions, simple classes)
+- Code refactoring (renaming, restructuring single functions)
+- Unit test generation
+- Small helper functions (<50 lines)
+- Documentation/docstring generation
+- Simple bug fixes in isolated code
+
+**DO NOT use Ollama for:**
+- Architecture decisions or multi-file redesigns
+- Complex debugging requiring deep context
+- System design or directive creation
+- Tasks requiring access to external APIs or services
+- Anything requiring the full codebase context
+
+**Delegation Protocol:**
+
+1. **Invoke via Bash:**
+   ```bash
+   python execution/ollama_chat.py --model qwen2.5-coder:7b-instruct --prompt "YOUR_TASK"
+   ```
+
+2. **For code changes, ALWAYS request unified diff format:**
+   ```bash
+   python execution/ollama_chat.py \
+     --model qwen2.5-coder:7b-instruct \
+     --system "Output ONLY a unified diff patch. No explanations." \
+     --prompt "Add type hints to: def process(data): return data.strip()"
+   ```
+
+3. **Apply the diff** (if output is clean):
+   ```bash
+   # Save diff to file
+   python execution/ollama_chat.py ... > /tmp/changes.patch
+
+   # Review then apply
+   git apply /tmp/changes.patch
+   ```
+
+4. **Validate** the changes and test before committing.
+
+**Privacy benefit:** Ollama runs locally. No code or sensitive data leaves your machine. Use this for any work involving confidential business logic, client data, or proprietary algorithms.
+
+**Tool location:** `execution/ollama_chat.py` (requires Ollama installed and running: `ollama serve`)
+
 ## Self-annealing loop
 
 Errors are learning opportunities. When something breaks:
