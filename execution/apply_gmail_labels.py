@@ -1,10 +1,11 @@
 """
-nimport sys
+Gmail Label Applier
+Applies category labels to emails in Gmail.
+"""
+
+import sys
 if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
-Gmail Label Manager
-Creates and applies labels to categorized emails.
-"""
 
 import os
 import json
@@ -23,7 +24,13 @@ LABEL_MAP = {
 }
 
 def load_categorized_emails(cache_path='.tmp/categorization_results.json'):
-    """Load categorized emails."""
+    """
+
+import sys
+if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
+Load categorized emails."""
     if not os.path.exists(cache_path):
         raise FileNotFoundError(f"Categorization results not found at {cache_path}")
 

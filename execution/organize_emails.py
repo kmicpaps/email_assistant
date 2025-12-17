@@ -1,10 +1,11 @@
 """
-nimport sys
+Email Organization Orchestrator
+Orchestrates the full email organization workflow.
+"""
+
+import sys
 if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
-Email Organization Orchestrator
-Main script that coordinates the entire email organization workflow.
-"""
 
 import os
 import sys
@@ -13,7 +14,13 @@ from datetime import datetime
 import subprocess
 
 def run_script(script_name, args=[]):
-    """Run a Python script and handle errors."""
+    """
+
+import sys
+if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
+Run a Python script and handle errors."""
     cmd = [sys.executable, script_name] + args
 
     print(f"\n{'='*60}")

@@ -1,16 +1,17 @@
 """
-nimport sys
-if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
 Draft Response Generator
 Creates draft responses for client inquiries and communications.
 """
+
+import sys
+if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 import os
 import json
 import re
 from datetime import datetime
-from anthropic import Anthropic
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -45,9 +46,9 @@ def load_client_context(sender_email):
 
     return None
 
-def generate_new_client_response(email, anthropic_key):
+def generate_new_client_response(email, openai_key):
     """Generate response for new client inquiry."""
-    client = Anthropic(api_key=anthropic_key)
+    client = OpenAI(api_key=openai_key)
 
     email_context = f"""
 Subject: {email['subject']}
@@ -73,21 +74,21 @@ Write a professional, warm, and helpful response that:
 Draft the email response (do not include subject line or greeting with their name - just the body):"""
 
     try:
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}]
         )
 
-        return message.content[0].text.strip()
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
         print(f"  Error generating response: {e}")
         return None
 
-def generate_existing_client_response(email, context, anthropic_key):
+def generate_existing_client_response(email, context, openai_key):
     """Generate response for existing client communication."""
-    client = Anthropic(api_key=anthropic_key)
+    client = OpenAI(api_key=openai_key)
 
     # Build context summary
     context_summary = f"""
@@ -134,13 +135,13 @@ Write a professional response that:
 Draft the email response (do not include subject line or greeting - just the body):"""
 
     try:
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
             max_tokens=600,
             messages=[{"role": "user", "content": prompt}]
         )
 
-        return message.content[0].text.strip()
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
         print(f"  Error generating response: {e}")
@@ -156,10 +157,10 @@ def generate_draft_responses(emails):
     Returns:
         List of draft objects
     """
-    anthropic_key = os.getenv('ANTHROPIC_API_KEY')
+    openai_key = os.getenv('OPENAI_API_KEY')
 
-    if not anthropic_key:
-        raise ValueError("ANTHROPIC_API_KEY not found in .env file")
+    if not openai_key:
+        raise ValueError("OPENAI_API_KEY not found in .env file")
 
     # Filter emails that need responses
     client_emails = [
@@ -189,9 +190,9 @@ def generate_draft_responses(emails):
 
         # Generate response
         if is_new_client:
-            response_body = generate_new_client_response(email, anthropic_key)
+            response_body = generate_new_client_response(email, openai_key)
         else:
-            response_body = generate_existing_client_response(email, context, anthropic_key)
+            response_body = generate_existing_client_response(email, context, openai_key)
 
         if response_body:
             draft = {

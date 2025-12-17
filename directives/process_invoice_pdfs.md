@@ -13,7 +13,7 @@ Extract structured data from invoice PDFs (date, sender, amount, currency) and o
 **Script**: `execution/extract_invoice_data.py`
 - Reads PDF files using pdfplumber and PyPDF2
 - Extracts text content from invoices
-- Uses LLM (Claude/OpenAI) to intelligently parse:
+- Uses LLM (OpenAI) to intelligently parse:
   - Invoice date
   - Sender/vendor name
   - Invoice number (if available)
@@ -185,7 +185,8 @@ Respond with ONLY valid JSON.
 - Duplicate invoices: flag and add to review queue
 
 ## Configuration (from .env)
-- `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` - For intelligent extraction
+- `OPENAI_API_KEY` - Primary LLM for intelligent extraction
+- `ANTHROPIC_API_KEY` - Fallback if OpenAI fails
 - `INVOICE_DIR=invoices` - Invoice directory
 - `USE_OCR=false` - Enable OCR for scanned PDFs (requires Tesseract)
 

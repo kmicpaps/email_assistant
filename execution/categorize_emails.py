@@ -1,10 +1,11 @@
 """
-nimport sys
+Email Categorization Script
+Categorizes emails using LLM.
+"""
+
+import sys
 if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
-Email Categorization Script
-Uses LLM to categorize emails into predefined categories.
-"""
 
 import os
 import sys
@@ -30,7 +31,13 @@ CATEGORIES = {
 }
 
 def load_emails_cache(cache_path='.tmp/emails_cache.json'):
-    """Load cached emails."""
+    """
+
+import sys
+if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
+Load cached emails."""
     if not os.path.exists(cache_path):
         raise FileNotFoundError(f"Email cache not found at {cache_path}")
 
@@ -136,7 +143,7 @@ Respond with ONLY the category name (e.g., "invoice" or "new_client_inquiry"). N
         print(f"OpenAI API error: {e}")
         return None
 
-def categorize_emails(emails, use_anthropic=True):
+def categorize_emails(emails, use_anthropic=False):
     """
     Categorize all emails using LLM.
 
@@ -217,8 +224,8 @@ if __name__ == '__main__':
     emails = load_emails_cache()
     print(f"Loaded {len(emails)} emails from cache.")
 
-    # Categorize (default to Anthropic)
-    use_anthropic = True
+    # Categorize (default to OpenAI)
+    use_anthropic = False
     if len(sys.argv) > 1 and sys.argv[1].lower() == 'openai':
         use_anthropic = False
 

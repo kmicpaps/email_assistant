@@ -1,10 +1,11 @@
 """
-nimport sys
-if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
 Invoice Processing Script
 Downloads invoice PDFs and logs invoice metadata.
 """
+
+import sys
+if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 import os
 import json

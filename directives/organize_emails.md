@@ -17,7 +17,7 @@ Automatically categorize, process, and organize emails within a specified time r
 
 ### 2. Email Categorization
 **Script**: `execution/categorize_emails.py`
-- Uses LLM (Anthropic Claude or OpenAI) to categorize each email
+- Uses LLM (OpenAI or Anthropic fallback) to categorize each email
 - Categories:
   - `advertising` - Marketing, promotional content
   - `invoice` - Bills, invoices, payment requests
@@ -39,7 +39,7 @@ Automatically categorize, process, and organize emails within a specified time r
 - For `new_client_inquiry`: Creates professional, welcoming response draft
 - For `existing_client`: Loads context from `client_contexts/`, generates contextual response
 - Saves drafts to `.tmp/drafts/` as JSON with email_id reference
-- Uses Anthropic Claude API for response generation
+- Uses OpenAI API for response generation
 
 ### 5. Client Context Manager
 **Script**: `execution/manage_client_context.py`
@@ -148,8 +148,8 @@ Automatically categorize, process, and organize emails within a specified time r
 - If context file corrupted: backup and create fresh
 
 ## Configuration (from .env)
-- `ANTHROPIC_API_KEY` - For categorization and draft generation
-- `OPENAI_API_KEY` - Fallback if Anthropic fails
+- `OPENAI_API_KEY` - Primary LLM for categorization and draft generation
+- `ANTHROPIC_API_KEY` - Fallback if OpenAI fails
 - Gmail OAuth - `credentials.json` and `token.json`
 - `INVOICE_DIR=invoices` - Invoice storage location
 - `TMP_DIR=.tmp` - Intermediate files

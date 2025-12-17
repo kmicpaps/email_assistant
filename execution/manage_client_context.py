@@ -1,23 +1,30 @@
 """
-nimport sys
+Client Context Manager
+Manages context files for ongoing client relationships.
+"""
+
+import sys
 if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
-Client Context Manager
-Maintains context files for client communications and projects.
-"""
 
 import os
 import json
 import re
 from datetime import datetime
-from anthropic import Anthropic
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 def load_categorized_emails(cache_path='.tmp/categorization_results.json'):
-    """Load categorized emails."""
+    """
+
+import sys
+if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
+Load categorized emails."""
     if not os.path.exists(cache_path):
         raise FileNotFoundError(f"Categorization results not found at {cache_path}")
 
@@ -52,9 +59,9 @@ def load_context(sender_email):
 
     return None
 
-def create_new_context(email, anthropic_key):
+def create_new_context(email, openai_key):
     """Create new context for a client using LLM analysis."""
-    client = Anthropic(api_key=anthropic_key)
+    client = OpenAI(api_key=openai_key)
 
     sender_email = extract_sender_email(email['from'])
     sender_name = extract_sender_name(email['from'])
@@ -82,14 +89,15 @@ Provide a JSON response with these fields:
 Respond with ONLY valid JSON, no other text."""
 
     try:
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
             max_tokens=300,
+            response_format={"type": "json_object"},
             messages=[{"role": "user", "content": prompt}]
         )
 
         # Parse LLM response
-        analysis = json.loads(message.content[0].text.strip())
+        analysis = json.loads(response.choices[0].message.content.strip())
 
         # Build context structure
         context = {
@@ -156,9 +164,9 @@ Respond with ONLY valid JSON, no other text."""
             'updated_at': datetime.now().isoformat()
         }
 
-def update_existing_context(context, email, anthropic_key):
+def update_existing_context(context, email, openai_key):
     """Update existing context with new email."""
-    client = Anthropic(api_key=anthropic_key)
+    client = OpenAI(api_key=openai_key)
 
     email_content = f"""
 Subject: {email['subject']}
@@ -188,13 +196,14 @@ Provide a JSON response with:
 Respond with ONLY valid JSON, no other text."""
 
     try:
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
             max_tokens=300,
+            response_format={"type": "json_object"},
             messages=[{"role": "user", "content": prompt}]
         )
 
-        analysis = json.loads(message.content[0].text.strip())
+        analysis = json.loads(response.choices[0].message.content.strip())
 
         # Add new communication
         new_comm = {
@@ -260,10 +269,10 @@ def manage_client_contexts(emails):
     Returns:
         Summary of context operations
     """
-    anthropic_key = os.getenv('ANTHROPIC_API_KEY')
+    openai_key = os.getenv('OPENAI_API_KEY')
 
-    if not anthropic_key:
-        raise ValueError("ANTHROPIC_API_KEY not found in .env file")
+    if not openai_key:
+        raise ValueError("OPENAI_API_KEY not found in .env file")
 
     # Filter client emails
     client_emails = [
@@ -285,11 +294,11 @@ def manage_client_contexts(emails):
 
         if context:
             print(f"  Updating existing context for {context.get('client_name', sender_email)}")
-            context = update_existing_context(context, email, anthropic_key)
+            context = update_existing_context(context, email, openai_key)
             contexts_updated += 1
         else:
             print(f"  Creating new context")
-            context = create_new_context(email, anthropic_key)
+            context = create_new_context(email, openai_key)
             contexts_created += 1
 
         # Save context

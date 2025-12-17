@@ -1,10 +1,11 @@
 """
-nimport sys
+Gmail Email Fetcher
+Authenticat with Gmail API and fetches emails within a date range.
+"""
+
+import sys
 if sys.platform == 'win32' and hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
-Gmail Email Fetcher
-Authenticates with Gmail API and fetches emails within a date range.
-"""
 
 import os
 import json
